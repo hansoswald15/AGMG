@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>QuarryOS — Aggregate Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   CSS VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --bg:#0a0d14;--bg2:#111622;--bg3:#161d2e;--bg4:#1c2540;
+  --border:#252f4a;--border2:#2d3a58;
+  --gold:#e8a045;--gold-dim:rgba(232,160,69,0.15);--gold-glow:rgba(232,160,69,0.35);
+  --blue:#4f8ef7;--blue-dim:rgba(79,142,247,0.15);
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,0.15);
+  --red:#f25e5e;--red-dim:rgba(242,94,94,0.15);
+  --amber:#f0aa30;--amber-dim:rgba(240,170,48,0.12);
+  --t1:#e8eaf0;--t2:#8d98b3;--t3:#5a6580;
+  --sw:260px;--th:60px;
+  --r:12px;--rs:8px;
+  --sh:0 4px 24px rgba(0,0,0,.4);--shs:0 2px 8px rgba(0,0,0,.3);
+  --tr:.18s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;-webkit-text-size-adjust:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit}
+table{border-collapse:collapse;width:100%}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+img{max-width:100%}
+
+/* ═══════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════ */
+#login-page{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 40%,rgba(232,160,69,.08),transparent 60%),radial-gradient(ellipse 40% 60% at 20% 70%,rgba(79,142,247,.07),transparent 60%)}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;opacity:.25}
+.login-wrap{position:relative;z-index:2;display:flex;width:860px;max-width:100%;border-radius:20px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.login-brand{flex:0 0 360px;background:linear-gradient(145deg,#111e38,#0d1828);padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.login-brand::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(232,160,69,.2),transparent 70%)}
+.lb-logo{display:flex;align-items:center;gap:12px}
+.lb-icon{width:42px;height:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lb-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.lb-sub{font-size:10px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.lb-hero{position:relative;z-index:1}
+.lb-hero h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1.3;margin-bottom:10px}
+.lb-hero h2 span{color:var(--gold)}
+.lb-hero p{color:var(--t2);font-size:13px;line-height:1.6}
+.lb-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lb-stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--rs);padding:12px}
+.lb-sv{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--gold)}
+.lb-sl{font-size:11px;color:var(--t3);margin-top:2px}
+.login-form{flex:1;background:var(--bg3);padding:48px 40px;display:flex;flex-direction:column;justify-content:center}
+.lf-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.lf-sub{color:var(--t2);font-size:13px;margin-bottom:28px}
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.fi{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--t1);font-size:13.5px;transition:var(--tr);outline:none}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.fi::placeholder{color:var(--t3)}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238d98b3' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.fsel option{background:var(--bg3)}
+.login-err{background:var(--red-dim);border:1px solid rgba(242,94,94,.3);color:var(--red);padding:10px 14px;border-radius:var(--rs);font-size:13px;margin-bottom:14px;display:none}
+.btn-login{width:100%;padding:13px;background:var(--gold);color:#0a0d14;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;border-radius:var(--rs);transition:var(--tr);letter-spacing:.3px;margin-top:4px}
+.btn-login:hover{background:#f0b060;transform:translateY(-1px);box-shadow:0 8px 24px var(--gold-glow)}
+.demo-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.demo-label{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.demo-chips{display:flex;flex-wrap:wrap;gap:6px}
+.demo-chip{font-size:11px;padding:5px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);color:var(--t2);cursor:pointer;transition:var(--tr)}
+.demo-chip:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+#app{display:none;height:100vh;overflow:hidden;position:relative}
+#app.active{display:flex}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;z-index:100;transition:transform var(--tr)}
+.sb-logo{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-icon{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.3px}
+.sb-sub{font-size:10px;color:var(--t3);letter-spacing:1.5px;text-transform:uppercase}
+.sb-nav{flex:1;overflow-y:auto;padding:14px 10px}
+.sb-sec{margin-bottom:20px}
+.sb-sec-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:1.8px;text-transform:uppercase;padding:0 10px;margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);color:var(--t2);font-size:13px;font-weight:500;transition:var(--tr);cursor:pointer;margin-bottom:2px;position:relative;user-select:none}
+.sb-item:hover{background:rgba(255,255,255,.05);color:var(--t1)}
+.sb-item.active{background:var(--gold-dim);color:var(--gold)}
+.sb-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--gold);border-radius:0 2px 2px 0}
+.sb-item.locked{opacity:.25;cursor:not-allowed;pointer-events:none}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;opacity:.8}
+.sb-item.active svg{opacity:1}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;line-height:1.4}
+.sb-footer{padding:12px 10px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;transition:var(--tr)}
+.sb-user:hover{background:rgba(255,255,255,.05)}
+.sb-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:11px;color:var(--gold)}
+
+/* ═══════════════════════════════════════
+   MAIN
+═══════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:var(--th);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg2);flex-shrink:0}
+.topbar-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:7px 12px;width:220px;transition:var(--tr)}
+.tb-search:focus-within{border-color:var(--border2)}
+.tb-search input{background:none;border:none;outline:none;color:var(--t1);font-size:12.5px;width:100%}
+.tb-search input::placeholder{color:var(--t3)}
+.tb-search svg{color:var(--t3);flex-shrink:0;width:14px;height:14px}
+.tb-date{font-size:11.5px;color:var(--t3);font-weight:500;white-space:nowrap}
+.tb-actions{display:flex;gap:6px;flex-shrink:0}
+.tb-btn{width:36px;height:36px;border-radius:var(--rs);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:var(--tr);position:relative;cursor:pointer}
+.tb-btn:hover{background:var(--bg4);border-color:var(--border2)}
+.tb-btn svg{width:16px;height:16px;color:var(--t2)}
+.notif-dot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:var(--red);border-radius:50%;border:2px solid var(--bg2)}
+.sb-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;flex-shrink:0}
+.sb-toggle svg{width:18px;height:18px;color:var(--t2)}
+.page-content{flex:1;overflow-y:auto;padding:24px}
+
+/* ═══════════════════════════════════════
+   COMPONENTS
+═══════════════════════════════════════ */
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);font-size:12.5px;font-weight:600;transition:var(--tr);white-space:nowrap;cursor:pointer}
+.btn svg{width:14px;height:14px}
+.btn-primary{background:var(--gold);color:#0a0d14;border:none}
+.btn-primary:hover{background:#f0b060;box-shadow:0 4px 16px var(--gold-glow)}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--t1)}
+.btn-ghost:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-danger{background:var(--red-dim);border:1px solid rgba(242,94,94,.3);color:var(--red)}
+.btn-danger:hover{background:rgba(242,94,94,.25)}
+.btn-success{background:var(--green-dim);border:1px solid rgba(62,207,142,.3);color:var(--green)}
+.btn-success:hover{background:rgba(62,207,142,.25)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* Cards */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card-accent{border-top:3px solid var(--gold)}
+.card-accent-blue{border-top:3px solid var(--blue)}
+.card-accent-green{border-top:3px solid var(--green)}
+
+/* Stats Grid */
+.stats-grid{display:grid;gap:14px;margin-bottom:20px}
+.sg-5{grid-template-columns:repeat(5,1fr)}
+.sg-4{grid-template-columns:repeat(4,1fr)}
+.sg-3{grid-template-columns:repeat(3,1fr)}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:14px;transition:var(--tr)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shs)}
+.stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:22px;height:22px}
+.si-gold{background:var(--gold-dim);color:var(--gold)}
+.si-blue{background:var(--blue-dim);color:var(--blue)}
+.si-green{background:var(--green-dim);color:var(--green)}
+.si-red{background:var(--red-dim);color:var(--red)}
+.si-amber{background:var(--amber-dim);color:var(--amber)}
+.stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;line-height:1}
+.stat-label{font-size:11.5px;color:var(--t2);margin-top:3px}
+.stat-change{font-size:11px;margin-top:5px;font-weight:600}
+.up{color:var(--green)}.down{color:var(--red)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+.data-table{width:100%;border-collapse:collapse;min-width:600px}
+.data-table th{background:var(--bg4);padding:11px 14px;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.data-table td{padding:13px 14px;font-size:12.5px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover{background:rgba(255,255,255,.02)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge.green{background:var(--green-dim);color:var(--green)}
+.badge.red{background:var(--red-dim);color:var(--red)}
+.badge.gold{background:var(--gold-dim);color:var(--gold)}
+.badge.blue{background:var(--blue-dim);color:var(--blue)}
+.badge.amber{background:var(--amber-dim);color:var(--amber)}
+.badge.grey{background:rgba(255,255,255,.07);color:var(--t2)}
+
+/* Progress */
+.progress-bar{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width .5s ease}
+.pf-gold{background:var(--gold)}.pf-blue{background:var(--blue)}.pf-green{background:var(--green)}.pf-red{background:var(--red)}
+
+/* Filters */
+.filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.f-input{padding:7px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);color:var(--t1);font-size:12.5px;outline:none;transition:var(--tr)}
+.f-input:focus{border-color:var(--border2)}
+.f-sel{padding:7px 28px 7px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);color:var(--t1);font-size:12.5px;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238d98b3' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+.f-sel option{background:var(--bg3)}
+
+/* Section header */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.sec-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.sec-sub{font-size:12.5px;color:var(--t2);margin-top:2px}
+
+/* Info/Warn boxes */
+.info-box{background:var(--blue-dim);border:1px solid rgba(79,142,247,.25);border-radius:var(--rs);padding:12px 16px;font-size:12.5px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.info-box svg{width:16px;height:16px;color:var(--blue);flex-shrink:0;margin-top:1px}
+.warn-box{background:var(--amber-dim);border:1px solid rgba(240,170,48,.25);border-radius:var(--rs);padding:12px 16px;font-size:12.5px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.warn-box svg{width:16px;height:16px;color:var(--amber);flex-shrink:0;margin-top:1px}
+.ro-banner{display:flex;align-items:center;gap:8px;background:var(--blue-dim);border:1px solid rgba(79,142,247,.2);border-radius:var(--rs);padding:10px 14px;margin-bottom:16px;font-size:12.5px}
+.ro-banner svg{width:14px;height:14px;color:var(--blue);flex-shrink:0}
+
+/* Access denied */
+.access-wall{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:40px}
+.aw-icon{width:68px;height:68px;background:var(--red-dim);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;border:1px solid rgba(242,94,94,.3)}
+.aw-icon svg{width:30px;height:30px;color:var(--red)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;width:540px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.5);animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hd{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:var(--rs);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);color:var(--t2)}
+.modal-close:hover{background:var(--bg4);color:var(--t1)}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:12px 24px 20px;display:flex;justify-content:flex-end;gap:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rs);color:var(--t1);font-size:13px;outline:none;transition:var(--tr)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim)}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238d98b3' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
+.form-select option{background:var(--bg3)}
+.form-textarea{resize:vertical;min-height:76px}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;gap:4px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+.pg-btn{width:32px;height:32px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:500;cursor:pointer;transition:var(--tr);border:1px solid var(--border);background:var(--bg3);color:var(--t2)}
+.pg-btn:hover{border-color:var(--border2);color:var(--t1)}
+.pg-btn.active{background:var(--gold);border-color:var(--gold);color:#0a0d14;font-weight:700}
+.pg-btn svg{width:12px;height:12px}
+
+/* Toast */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh);min-width:260px;max-width:340px;animation:tIn .3s ease;font-size:12.5px;pointer-events:auto}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.toast.success .ti{color:var(--green)}.toast.error .ti{color:var(--red)}.toast.info .ti{color:var(--blue)}
+.ti svg{width:16px;height:16px}
+
+/* Overlay */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* Misc */
+.shift-morning{background:rgba(255,220,100,.12);color:#ffd060;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.shift-evening{background:rgba(255,140,60,.12);color:#ff8c3c;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.shift-night{background:rgba(100,130,255,.12);color:#7a9aff;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+code.ref{font-size:11px;font-family:monospace;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.06)}
+.dash-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px}
+.dash-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.stock-bar-item{margin-bottom:14px}
+.stock-bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.stock-bar-name{font-size:13px;font-weight:600}
+.stock-bar-nums{font-size:11.5px;color:var(--t2)}
+.stock-bar-nums b{color:var(--t1)}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.act-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.act-dot svg{width:13px;height:13px}
+.act-text{font-size:12.5px;line-height:1.4}
+.act-time{font-size:11px;color:var(--t3);margin-top:2px}
+.dispatch-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.dispatch-item:last-child{border-bottom:none}
+.dispatch-truck{width:36px;height:36px;background:var(--blue-dim);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--blue)}
+.dispatch-truck svg{width:16px;height:16px}
+.wb-calc{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:20px;text-align:center}
+.wb-calc-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.wb-calc-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--gold)}
+.wb-calc-unit{font-size:12.5px;color:var(--t2);margin-top:2px}
+.stock-visual-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;transition:var(--tr)}
+.stock-visual-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.svc-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.svc-icon svg{width:26px;height:26px}
+.svc-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700}
+.svc-unit{font-size:11px;color:var(--t2);margin-top:2px}
+.svc-name{font-size:13px;font-weight:600;margin:7px 0 4px}
+.customer-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:var(--tr)}
+.customer-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shs)}
+.cust-av{width:44px;height:44px;border-radius:50%;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.cust-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px}
+.cust-detail{font-size:11.5px;color:var(--t2);display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.cust-detail svg{width:12px;height:12px;flex-shrink:0}
+.cust-stats{display:flex;gap:14px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.cust-stat-val{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.cust-stat-label{font-size:11px;color:var(--t3)}
+.report-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:var(--tr)}
+.report-card:hover{border-color:var(--gold);background:var(--gold-dim)}
+.report-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.report-icon svg{width:20px;height:20px}
+.user-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:12px;transition:var(--tr)}
+.user-card:hover{border-color:var(--border2)}
+.user-av{width:40px;height:40px;border-radius:50%;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.my-role-row{background:rgba(232,160,69,.06)!important}
+.my-role-row td:first-child{color:var(--gold)}
+.perm-full{color:var(--green);font-weight:600;font-size:12px}
+.perm-view{color:var(--blue);font-size:11px;background:var(--blue-dim);padding:2px 7px;border-radius:99px}
+.perm-entry{color:var(--gold);font-size:11px;background:var(--gold-dim);padding:2px 7px;border-radius:99px}
+.perm-order{color:var(--amber);font-size:11px;background:var(--amber-dim);padding:2px 7px;border-radius:99px}
+.perm-no{color:var(--red);font-weight:600;font-size:12px}
+.fade-in{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.divider{height:1px;background:var(--border);margin:18px 0}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:1100px){
+  .sg-5{grid-template-columns:repeat(3,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .dash-grid-3{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);z-index:200}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .sb-toggle{display:flex}
+  .tb-search{display:none}
+  .sg-4,.sg-5{grid-template-columns:repeat(2,1fr)}
+  .dash-grid-3{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  :root{--sw:240px}
+  .page-content{padding:14px}
+  .topbar{padding:0 14px;gap:8px}
+  .sg-3,.sg-4,.sg-5{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .modal{border-radius:16px 16px 0 0;position:fixed;bottom:0;width:100%;max-width:100%;margin:0}
+  .modal-overlay{align-items:flex-end;padding:0}
+  .login-wrap{flex-direction:column}
+  .login-brand{flex:none;padding:28px 24px}
+  .login-form{padding:28px 24px}
+  .tb-date{display:none}
+  .stats-grid.sg-5{grid-template-columns:1fr 1fr}
+  .filters{gap:6px}
+}
+@media(max-width:400px){
+  .sg-3,.sg-4,.sg-5{grid-template-columns:1fr}
+  .sec-hd{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="tc"></div>
+
+<!-- ════════════════════ LOGIN ════════════════════ -->
+<div id="login-page">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="lb-logo">
+        <div class="lb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0d14" stroke-width="2.5" width="20" height="20"><path d="M2 20h20M4 20V10l8-8 8 8v10"/><path d="M9 20v-8h6v8"/></svg></div>
+        <div><div class="lb-name">QuarryOS</div><div class="lb-sub">Management System</div></div>
+      </div>
+      <div class="lb-hero">
+        <h2>Built for the <span>Modern Quarry</span></h2>
+        <p>Track production, manage stock, handle dispatch and billing — with real role-based access control.</p>
+      </div>
+      <div class="lb-stats">
+        <div class="lb-stat"><div class="lb-sv" id="lb-disp">—</div><div class="lb-sl">Tons Dispatched Today</div></div>
+        <div class="lb-stat"><div class="lb-sv" id="lb-orders">—</div><div class="lb-sl">Active Orders</div></div>
+        <div class="lb-stat"><div class="lb-sv" id="lb-stock">—</div><div class="lb-sl">Total Stock (tons)</div></div>
+        <div class="lb-stat"><div class="lb-sv" id="lb-rev">—</div><div class="lb-sl">Revenue This Month</div></div>
+      </div>
+    </div>
+    <div class="login-form">
+      <div class="lf-title">Welcome Back</div>
+      <div class="lf-sub">Sign in to your QuarryOS account</div>
+      <div class="login-err" id="loginErr"></div>
+      <div class="fg"><label class="fl">Username</label><input class="fi" type="text" id="loginUser" placeholder="Enter username" autocomplete="username"></div>
+      <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="fg"><label class="fl">Login As</label>
+        <select class="fi fsel" id="loginRole">
+          <option value="">— Select your role —</option>
+          <option value="admin">Admin (Full Access)</option>
+          <option value="production_manager">Production Manager</option>
+          <option value="machine_operator">Machine Operator</option>
+          <option value="weighbridge_operator">Weighbridge Operator</option>
+          <option value="accountant">Accountant</option>
+          <option value="sales_officer">Sales Officer</option>
+          <option value="auditor">Auditor (Read-only)</option>
+        </select>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Sign In to QuarryOS →</button>
+      <div class="demo-section">
+        <div class="demo-label">Demo — tap to auto-fill</div>
+        <div class="demo-chips">
+          <span class="demo-chip" onclick="fillDemo('admin')">Admin</span>
+          <span class="demo-chip" onclick="fillDemo('production_manager')">Prod. Manager</span>
+          <span class="demo-chip" onclick="fillDemo('machine_operator')">Machine Op.</span>
+          <span class="demo-chip" onclick="fillDemo('weighbridge_operator')">Weighbridge</span>
+          <span class="demo-chip" onclick="fillDemo('accountant')">Accountant</span>
+          <span class="demo-chip" onclick="fillDemo('sales_officer')">Sales Officer</span>
+          <span class="demo-chip" onclick="fillDemo('auditor')">Auditor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ APP ════════════════════ -->
+<div id="app">
+  <div class="sidebar-overlay" id="sbOverlay" onclick="closeSB()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0d14" stroke-width="2.5" width="18" height="18"><path d="M2 20h20M4 20V10l8-8 8 8v10"/><path d="M9 20v-8h6v8"/></svg></div>
+      <div><div class="sb-name">QuarryOS</div><div class="sb-sub">Management System</div></div>
+    </div>
+    <nav class="sb-nav" id="sbNav"></nav>
+    <div class="sb-footer">
+      <div class="sb-user" onclick="doLogout()">
+        <div class="sb-av" id="sbAv"></div>
+        <div style="flex:1;min-width:0"><div class="sb-uname" id="sbUname"></div><div class="sb-urole" id="sbUrole"></div></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14" style="color:var(--t3);flex-shrink:0" title="Logout"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="sb-toggle" onclick="toggleSB()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+      <div class="topbar-title" id="topTitle">Dashboard</div>
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search orders, batches...">
+      </div>
+      <div class="tb-date" id="tbDate"></div>
+      <div class="tb-actions">
+        <div class="tb-btn" onclick="toast('No new notifications','info')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="tb-btn" onclick="doLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="page-content" id="pageContent"></div>
+  </div>
+</div>
+
+<!-- ════════════════════ MODALS ════════════════════ -->
+<!-- Production Modal -->
+<div class="modal-overlay" id="mProduction">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">New Production Entry</div><button class="modal-close" onclick="closeModal('mProduction')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Batch ID will be auto-assigned. Stock will update automatically.</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Product Type</label><select class="form-select" id="mp-product"><option>Stone Dust</option><option>Chippings</option><option>½ Inch</option><option>¾ Inch</option><option>1 Inch</option></select></div>
+        <div class="form-group"><label class="form-label">Quantity (Tons)</label><input class="form-input" type="number" id="mp-qty" placeholder="e.g. 240" min="1"></div>
+        <div class="form-group"><label class="form-label">Machine Used</label><select class="form-select" id="mp-machine"><option>Crusher #1</option><option>Crusher #2</option><option>Screener #1</option><option>Screener #2</option><option>Jaw Crusher</option></select></div>
+        <div class="form-group"><label class="form-label">Shift</label><select class="form-select" id="mp-shift"><option value="morning">Morning (06:00–14:00)</option><option value="evening">Evening (14:00–22:00)</option><option value="night">Night (22:00–06:00)</option></select></div>
+        <div class="form-group"><label class="form-label">Operator</label><select class="form-select" id="mp-operator"></select></div>
+        <div class="form-group"><label class="form-label">Date & Time</label><input class="form-input" type="datetime-local" id="mp-datetime"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes (Optional)</label><textarea class="form-textarea" id="mp-notes" placeholder="Any observations..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mProduction')">Cancel</button><button class="btn btn-primary" onclick="submitProduction()">Save Batch Entry</button></div>
+  </div>
+</div>
+
+<!-- Weighbridge Modal -->
+<div class="modal-overlay" id="mWeighbridge">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Weighbridge Entry</div><button class="modal-close" onclick="closeModal('mWeighbridge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Linked Order</label><select class="form-select" id="mw-order"></select></div>
+        <div class="form-group"><label class="form-label">Product</label><select class="form-select" id="mw-product"><option>Stone Dust</option><option>Chippings</option><option>½ Inch</option><option>¾ Inch</option><option>1 Inch</option></select></div>
+        <div class="form-group"><label class="form-label">Truck Number</label><input class="form-input" type="text" id="mw-truck" placeholder="e.g. TZA-5510"></div>
+        <div class="form-group"><label class="form-label">Driver Name</label><input class="form-input" type="text" id="mw-driver" placeholder="Driver full name"></div>
+        <div class="form-group"><label class="form-label">Gross Weight (kg)</label><input class="form-input" type="number" id="mw-gross" placeholder="e.g. 42600" oninput="calcModalWB()"></div>
+        <div class="form-group"><label class="form-label">Tare Weight (kg)</label><input class="form-input" type="number" id="mw-tare" placeholder="e.g. 16800" oninput="calcModalWB()"></div>
+      </div>
+      <div class="wb-calc" style="margin-top:4px"><div class="wb-calc-label">Net Weight</div><div class="wb-calc-val" id="mw-net">—</div><div class="wb-calc-unit" id="mw-net-t"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mWeighbridge')">Cancel</button><button class="btn btn-primary" onclick="submitWeighbridge()">Confirm & Dispatch</button></div>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="modal-overlay" id="mOrder">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Create New Order</div><button class="modal-close" onclick="closeModal('mOrder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Customer</label><select class="form-select" id="mo-customer"></select></div>
+        <div class="form-group"><label class="form-label">Product Type</label><select class="form-select" id="mo-product"><option>Stone Dust</option><option>Chippings</option><option>½ Inch</option><option>¾ Inch</option><option>1 Inch</option></select></div>
+        <div class="form-group"><label class="form-label">Quantity (Tons)</label><input class="form-input" type="number" id="mo-qty" placeholder="e.g. 200" min="1"></div>
+        <div class="form-group"><label class="form-label">Unit Price (TZS/ton)</label><input class="form-input" type="number" id="mo-price" placeholder="e.g. 970" min="1"></div>
+        <div class="form-group"><label class="form-label">Delivery Location</label><input class="form-input" type="text" id="mo-location" placeholder="e.g. Jangwani"></div>
+        <div class="form-group"><label class="form-label">Required By</label><input class="form-input" type="date" id="mo-date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Special Instructions</label><textarea class="form-textarea" id="mo-notes" placeholder="Any special requirements..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mOrder')">Cancel</button><button class="btn btn-primary" onclick="submitOrder()">Create Order</button></div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="mCustomer">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Add New Customer</div><button class="modal-close" onclick="closeModal('mCustomer')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Company Name</label><input class="form-input" type="text" id="mc-name" placeholder="Company name"></div>
+        <div class="form-group"><label class="form-label">Contact Person</label><input class="form-input" type="text" id="mc-contact" placeholder="Full name"></div>
+        <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" type="tel" id="mc-phone" placeholder="+255 7XX XXX XXX"></div>
+        <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="mc-email" placeholder="email@company.com"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Location / Address</label><input class="form-input" type="text" id="mc-location" placeholder="e.g. Kariakoo, Dar es Salaam"></div>
+      <div class="form-group"><label class="form-label">Credit Terms / Notes</label><textarea class="form-textarea" id="mc-notes" placeholder="Payment terms, special notes..."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mCustomer')">Cancel</button><button class="btn btn-primary" onclick="submitCustomer()">Add Customer</button></div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="mUser">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Add System User</div><button class="modal-close" onclick="closeModal('mUser')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="mu-name" placeholder="First and Last name"></div>
+        <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="mu-email" placeholder="user@quarryos.com"></div>
+        <div class="form-group"><label class="form-label">Role</label>
+          <select class="form-select" id="mu-role">
+            <option value="production_manager">Production Manager</option>
+            <option value="machine_operator">Machine Operator</option>
+            <option value="weighbridge_operator">Weighbridge Operator</option>
+            <option value="accountant">Accountant</option>
+            <option value="sales_officer">Sales Officer</option>
+            <option value="auditor">Auditor</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Temporary Password</label><input class="form-input" type="password" id="mu-pass" placeholder="Minimum 6 characters"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mUser')">Cancel</button><button class="btn btn-primary" onclick="submitUser()">Create User</button></div>
+  </div>
+</div>
+
+<!-- Invoice Modal -->
+<div class="modal-overlay" id="mInvoice">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title" id="mInv-title">Invoice Details</div><button class="modal-close" onclick="closeModal('mInvoice')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" id="mInv-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('mInvoice')">Close</button><button class="btn btn-success" id="mInv-pay-btn" onclick="recordPayment()">Record Payment</button></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CONSTANTS & CONFIG
+═══════════════════════════════════════════════ */
+const PRODUCTS = ['Stone Dust','Chippings','½ Inch','¾ Inch','1 Inch'];
+const PRODUCT_CAPS = {
+  'Stone Dust':3000,'Chippings':3500,'½ Inch':2000,'¾ Inch':2500,'1 Inch':1500
+};
+const ROLE_PERMS = {
+  admin:                {dashboard:'full',production:'full',stock:'full',weighbridge:'full',dispatch:'full',sales:'full',customers:'full',reports:'full',users:'full',audit:'full'},
+  production_manager:   {dashboard:'view',production:'full',stock:'view',weighbridge:null,dispatch:'view',sales:null,customers:'view',reports:'view',users:null,audit:null},
+  machine_operator:     {dashboard:null,production:'entry',stock:null,weighbridge:null,dispatch:null,sales:null,customers:null,reports:null,users:null,audit:null},
+  weighbridge_operator: {dashboard:'view',production:null,stock:'view',weighbridge:'full',dispatch:'view',sales:null,customers:null,reports:null,users:null,audit:null},
+  accountant:           {dashboard:'view',production:null,stock:'view',weighbridge:'view',dispatch:'view',sales:'full',customers:'view',reports:'full',users:null,audit:null},
+  sales_officer:        {dashboard:'view',production:null,stock:'view',weighbridge:null,dispatch:'order',sales:'order',customers:'full',reports:'view',users:null,audit:null},
+  auditor:              {dashboard:'view',production:'view',stock:'view',weighbridge:'view',dispatch:'view',sales:'view',customers:'view',reports:'full',users:'view',audit:'full'},
+};
+const USERS_CFG = {
+  admin:                {username:'admin',    password:'admin123',  name:'John Maganga',   initials:'JM',color:'linear-gradient(135deg,#e8a045,#c4772a)',tc:'#0a0d14'},
+  production_manager:   {username:'prodmgr',  password:'prod123',   name:'Grace Nkosi',    initials:'GN',color:'linear-gradient(135deg,#4f8ef7,#2a5abc)',tc:'#fff'},
+  machine_operator:     {username:'operator', password:'op123',     name:'David Mutua',    initials:'DM',color:'linear-gradient(135deg,#f0aa30,#b87d00)',tc:'#0a0d14'},
+  weighbridge_operator: {username:'wbridge',  password:'wb123',     name:'Sarah Kamau',    initials:'SK',color:'linear-gradient(135deg,#3ecf8e,#1a8a60)',tc:'#fff'},
+  accountant:           {username:'accounts', password:'acc123',    name:'Peter Omondi',   initials:'PO',color:'linear-gradient(135deg,#9b59b6,#6c3483)',tc:'#fff'},
+  sales_officer:        {username:'sales',    password:'sales123',  name:'Ali Suleiman',   initials:'AS',color:'linear-gradient(135deg,#22c55e,#15803d)',tc:'#fff'},
+  auditor:              {username:'auditor',  password:'audit123',  name:'Alice Wambua',   initials:'AW',color:'linear-gradient(135deg,#f25e5e,#8a2020)',tc:'#fff'},
+};
+const ROLE_LABELS = {
+  admin:'Admin',production_manager:'Production Manager',machine_operator:'Machine Operator',
+  weighbridge_operator:'Weighbridge Operator',accountant:'Accountant',sales_officer:'Sales Officer',auditor:'Auditor'
+};
+const PAGE_TITLES = {
+  dashboard:'Dashboard',production:'Production Entry',stock:'Stock Management',
+  weighbridge:'Weighbridge',dispatch:'Orders & Dispatch',sales:'Sales & Billing',
+  customers:'Customers',reports:'Reports & Analytics',users:'User Management',audit:'Audit Logs'
+};
+const NAV = [
+  {section:'Overview',items:[{id:'dashboard',label:'Dashboard',icon:'grid'}]},
+  {section:'Operations',items:[
+    {id:'production',label:'Production Entry',icon:'tool'},
+    {id:'stock',label:'Stock Management',icon:'box'},
+    {id:'weighbridge',label:'Weighbridge',icon:'scale',badge:'wb'},
+    {id:'dispatch',label:'Orders & Dispatch',icon:'truck'}
+  ]},
+  {section:'Finance',items:[
+    {id:'sales',label:'Sales & Billing',icon:'card'},
+    {id:'customers',label:'Customers',icon:'users'}
+  ]},
+  {section:'Insights',items:[{id:'reports',label:'Reports & Analytics',icon:'chart'}]},
+  {section:'Admin',items:[
+    {id:'users',label:'User Management',icon:'user'},
+    {id:'audit',label:'Audit Logs',icon:'check'}
+  ]}
+];
+const ICONS = {
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  tool:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3-3a1 1 0 000-1.4l-1.6-1.6a1 1 0 00-1.4 0l-3 3z"/><path d="M9 3H5a2 2 0 00-2 2v4"/><path d="M3 14l3 3 8-8"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+  scale:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+};
+
+/* ═══════════════════════════════════════════════
+   LOCAL STORAGE DATA LAYER
+═══════════════════════════════════════════════ */
+const LS_KEY = 'quarryos_v2';
+let DB = {};
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) DB = JSON.parse(raw);
+  } catch(e) { DB = {}; }
+  // Initialize missing tables
+  if (!DB.stock) DB.stock = {'Stone Dust':1840,'Chippings':2100,'½ Inch':920,'¾ Inch':780,'1 Inch':650};
+  if (!DB.production) DB.production = [
+    {id:'B-2024-0847',product:'Stone Dust',qty:240,machine:'Crusher #1',shift:'morning',operator:'John Maganga',datetime:'2025-01-15T14:32',notes:'',status:'Completed',addedBy:'John Maganga'},
+    {id:'B-2024-0846',product:'½ Inch',qty:180,machine:'Screener #1',shift:'evening',operator:'Peter Omondi',datetime:'2025-01-15T10:15',notes:'',status:'Completed',addedBy:'Peter Omondi'},
+    {id:'B-2024-0845',product:'Chippings',qty:320,machine:'Crusher #2',shift:'morning',operator:'David Mutua',datetime:'2025-01-15T07:00',notes:'',status:'Completed',addedBy:'David Mutua'},
+    {id:'B-2024-0844',product:'¾ Inch',qty:210,machine:'Screener #2',shift:'night',operator:"Michael Ndung'u",datetime:'2025-01-14T22:45',notes:'',status:'Completed',addedBy:"Michael Ndung'u"},
+    {id:'B-2024-0843',product:'1 Inch',qty:160,machine:'Jaw Crusher',shift:'evening',operator:'John Maganga',datetime:'2025-01-14T16:20',notes:'',status:'Completed',addedBy:'John Maganga'},
+    {id:'B-2024-0842',product:'Stone Dust',qty:290,machine:'Crusher #1',shift:'morning',operator:'David Mutua',datetime:'2025-01-14T08:10',notes:'',status:'Completed',addedBy:'David Mutua'},
+  ];
+  if (!DB.weighbridge) DB.weighbridge = [
+    {id:'WB-0421',orderId:'ORD-0310',truck:'TZA-4821',driver:'Ali Hassan',product:'Chippings',gross:46200,tare:17800,net:28400,netTons:28.40,datetime:'2025-01-15T13:51',status:'Dispatched',operator:'Sarah Kamau'},
+    {id:'WB-0420',orderId:'ORD-0309',truck:'TZA-4421',driver:'Omar Said',product:'¾ Inch',gross:50400,tare:17800,net:32600,netTons:32.60,datetime:'2025-01-15T12:20',status:'Dispatched',operator:'Sarah Kamau'},
+    {id:'WB-0419',orderId:'ORD-0308',truck:'TZA-3302',driver:'James Mwangi',product:'Stone Dust',gross:48800,tare:17800,net:31000,netTons:31.00,datetime:'2025-01-15T10:05',status:'Dispatched',operator:'Sarah Kamau'},
+  ];
+  if (!DB.orders) DB.orders = [
+    {id:'ORD-0312',customerId:'C001',product:'¾ Inch',qty:200,price:970,dispatched:154.4,location:'Jangwani',date:'2025-01-14',requiredBy:'2025-01-18',status:'In Progress',notes:'',createdBy:'John Maganga'},
+    {id:'ORD-0311',customerId:'C002',product:'Chippings',qty:500,price:970,dispatched:500,location:'Kariakoo',date:'2025-01-13',requiredBy:'2025-01-17',status:'Completed',notes:'',createdBy:'John Maganga'},
+    {id:'ORD-0310',customerId:'C003',product:'Stone Dust',qty:300,price:900,dispatched:271.6,location:'Msasani',date:'2025-01-14',requiredBy:'2025-01-18',status:'In Progress',notes:'',createdBy:'Ali Suleiman'},
+    {id:'ORD-0309',customerId:'C004',product:'½ Inch',qty:150,price:950,dispatched:150,location:'Kinondoni',date:'2025-01-13',requiredBy:'2025-01-16',status:'Completed',notes:'',createdBy:'Ali Suleiman'},
+    {id:'ORD-0308',customerId:'C005',product:'1 Inch',qty:400,price:990,dispatched:0,location:'Ilala',date:'2025-01-15',requiredBy:'2025-01-20',status:'Pending',notes:'',createdBy:'John Maganga'},
+  ];
+  if (!DB.invoices) DB.invoices = [
+    {id:'INV-0284',orderId:'ORD-0311',customerId:'C002',product:'Chippings',qty:500,amount:485000,method:'Bank Transfer',date:'2025-01-15',status:'Paid',paidDate:'2025-01-15',notes:''},
+    {id:'INV-0283',orderId:'ORD-0309',customerId:'C004',product:'½ Inch',qty:150,amount:142500,method:'Mobile Money',date:'2025-01-14',status:'Paid',paidDate:'2025-01-14',notes:''},
+    {id:'INV-0282',orderId:'ORD-0308',customerId:'C005',product:'1 Inch',qty:400,amount:396000,method:'',date:'2025-01-12',status:'Overdue',paidDate:'',notes:''},
+    {id:'INV-0281',orderId:'ORD-0310',customerId:'C003',product:'Stone Dust',qty:300,amount:270000,method:'Cheque',date:'2025-01-13',status:'Partial',paidDate:'',notes:'Partial payment received'},
+    {id:'INV-0280',orderId:'ORD-0312',customerId:'C001',product:'¾ Inch',qty:200,amount:194000,method:'Bank Transfer',date:'2025-01-11',status:'Paid',paidDate:'2025-01-12',notes:''},
+  ];
+  if (!DB.customers) DB.customers = [
+    {id:'C001',name:'Africa Aggregates Ltd',contact:'Salim Bakari',phone:'+255 712 345 678',email:'info@africaagg.co.tz',location:'Jangwani, Dar es Salaam',notes:'Net 30 payment terms',createdAt:'2024-06-01'},
+    {id:'C002',name:'Tanzarock Builders',contact:'Jane Mwamba',phone:'+255 754 876 543',email:'info@tanzarock.co.tz',location:'Kariakoo, Dar es Salaam',notes:'Preferred customer',createdAt:'2024-07-12'},
+    {id:'C003',name:'KiloStone Ltd',contact:'Mark Oduya',phone:'+255 768 234 901',email:'orders@kilostone.co.tz',location:'Msasani, Dar es Salaam',notes:'',createdAt:'2024-08-05'},
+    {id:'C004',name:'Bahari Roads Ltd',contact:'Amina Salim',phone:'+255 785 442 310',email:'amina@bahariroads.co.tz',location:'Kinondoni, Dar es Salaam',notes:'Government contractor',createdAt:'2024-09-20'},
+    {id:'C005',name:'Nyumbani Construction',contact:'James Omondi',phone:'+255 711 987 654',email:'james@nyumbani.co.tz',location:'Ilala, Dar es Salaam',notes:'Cash only',createdAt:'2024-10-15'},
+  ];
+  if (!DB.systemUsers) DB.systemUsers = [
+    {id:'SU001',name:'John Maganga',email:'john@quarryos.com',role:'admin',active:true,createdAt:'2024-01-01'},
+    {id:'SU002',name:'Grace Nkosi',email:'grace@quarryos.com',role:'production_manager',active:true,createdAt:'2024-01-01'},
+    {id:'SU003',name:'Sarah Kamau',email:'sarah@quarryos.com',role:'weighbridge_operator',active:true,createdAt:'2024-01-01'},
+    {id:'SU004',name:'Peter Omondi',email:'peter@quarryos.com',role:'accountant',active:true,createdAt:'2024-01-01'},
+    {id:'SU005',name:'David Mutua',email:'david@quarryos.com',role:'machine_operator',active:true,createdAt:'2024-01-01'},
+    {id:'SU006',name:'Ali Suleiman',email:'ali@quarryos.com',role:'sales_officer',active:true,createdAt:'2024-01-01'},
+    {id:'SU007',name:'Alice Wambua',email:'alice@quarryos.com',role:'auditor',active:true,createdAt:'2024-01-01'},
+  ];
+  if (!DB.stockMovements) DB.stockMovements = [
+    {datetime:'2025-01-15T14:32',product:'Stone Dust',type:'IN · Production',qty:+240,ref:'B-2024-0847',balance:1840,operator:'John M.'},
+    {datetime:'2025-01-15T13:51',product:'Chippings',type:'OUT · Dispatch',qty:-28.4,ref:'WB-0421',balance:2128,operator:'Sarah K.'},
+    {datetime:'2025-01-15T12:20',product:'¾ Inch',type:'OUT · Dispatch',qty:-32.6,ref:'WB-0420',balance:812,operator:'Sarah K.'},
+    {datetime:'2025-01-15T10:15',product:'½ Inch',type:'IN · Production',qty:+180,ref:'B-2024-0846',balance:920,operator:'Peter O.'},
+    {datetime:'2025-01-15T07:00',product:'Chippings',type:'IN · Production',qty:+320,ref:'B-2024-0845',balance:2156,operator:'David M.'},
+  ];
+  if (!DB.auditLog) DB.auditLog = [
+    {ts:'2025-01-15T14:32:18',user:'John Maganga',role:'admin',action:'CREATE',module:'Production',recordId:'B-2024-0847',detail:'New batch — 240t Stone Dust',ip:'192.168.1.10'},
+    {ts:'2025-01-15T13:51:05',user:'Sarah Kamau',role:'weighbridge_operator',action:'CREATE',module:'Weighbridge',recordId:'WB-0421',detail:'Ticket for TZA-4821 — 28.4t',ip:'192.168.1.14'},
+    {ts:'2025-01-15T13:20:44',user:'Peter Omondi',role:'accountant',action:'UPDATE',module:'Sales',recordId:'INV-0284',detail:'Payment recorded — TZS 485,000',ip:'192.168.1.12'},
+    {ts:'2025-01-15T11:05:32',user:'John Maganga',role:'admin',action:'CREATE',module:'Orders',recordId:'ORD-0312',detail:'New order — Africa Aggregates Ltd',ip:'192.168.1.10'},
+    {ts:'2025-01-15T09:14:50',user:'Alice Wambua',role:'auditor',action:'EXPORT',module:'Reports',recordId:'RPT-0044',detail:'Production report exported — Jan 2025',ip:'192.168.1.20'},
+  ];
+  if (!DB.batchCounter) DB.batchCounter = 848;
+  if (!DB.wbCounter) DB.wbCounter = 422;
+  if (!DB.orderCounter) DB.orderCounter = 313;
+  if (!DB.invoiceCounter) DB.invoiceCounter = 285;
+  if (!DB.customerCounter) DB.customerCounter = 6;
+  if (!DB.suCounter) DB.suCounter = 8;
+  saveDB();
+}
+
+function saveDB() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(DB)); } catch(e) { console.warn('LS save failed',e); }
+}
+
+function addAudit(action, module, recordId, detail) {
+  DB.auditLog.unshift({
+    ts: new Date().toISOString().slice(0,19),
+    user: currentUser ? currentUser.name : 'System',
+    role: currentRole || 'system',
+    action, module, recordId, detail,
+    ip: '192.168.1.'+Math.floor(Math.random()*50+10)
+  });
+  if (DB.auditLog.length > 200) DB.auditLog.pop();
+  saveDB();
+}
+
+/* ═══════════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════════ */
+let currentRole = null;
+let currentUser = null;
+let currentInvoiceId = null;
+let currentPage = 'dashboard';
+
+/* ═══════════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════════ */
+function fillDemo(role) {
+  const u = USERS_CFG[role];
+  document.getElementById('loginUser').value = u.username;
+  document.getElementById('loginPass').value = u.password;
+  document.getElementById('loginRole').value = role;
+  document.getElementById('loginErr').style.display = 'none';
+}
+
+function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const role     = document.getElementById('loginRole').value;
+  const errEl    = document.getElementById('loginErr');
+  if (!role) { showErr('Please select a role.'); return; }
+  const u = USERS_CFG[role];
+  if (!u || u.username !== username || u.password !== password) {
+    showErr('Invalid credentials. Use the demo buttons above to auto-fill.');
+    return;
+  }
+  errEl.style.display = 'none';
+  currentRole = role; currentUser = u;
+  // Avatar
+  const av = document.getElementById('sbAv');
+  av.textContent = u.initials; av.style.background = u.color; av.style.color = u.tc;
+  document.getElementById('sbUname').textContent = u.name;
+  document.getElementById('sbUrole').textContent = ROLE_LABELS[role];
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  buildSidebar();
+  updateDate();
+  addAudit('LOGIN','Auth','—','User login: '+u.name);
+  const perms = ROLE_PERMS[role];
+  const first = ['dashboard','production','stock','weighbridge','dispatch','sales','customers','reports','users','audit'].find(p => perms[p]);
+  showPage(first || 'dashboard');
+  toast('Welcome back, '+u.name+'!','success');
+}
+function showErr(msg) {
+  const e = document.getElementById('loginErr');
+  e.textContent = msg; e.style.display = 'block';
+}
+function doLogout() {
+  addAudit('LOGOUT','Auth','—','User logged out: '+(currentUser?currentUser.name:''));
+  currentRole = null; currentUser = null;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginRole').value = '';
+  toast('Logged out successfully','info');
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════ */
+function buildSidebar() {
+  const nav = document.getElementById('sbNav');
+  const perms = ROLE_PERMS[currentRole];
+  let html = '';
+  NAV.forEach(sec => {
+    html += `<div class="sb-sec"><div class="sb-sec-label">${sec.section}</div>`;
+    sec.items.forEach(item => {
+      const perm = perms[item.id];
+      const locked = !perm;
+      const pendingWB = item.badge === 'wb' ? DB.weighbridge.filter(w => w.status === 'Pending').length : 0;
+      const badge = item.badge === 'wb' && pendingWB > 0 && !locked ? `<span class="sb-badge">${pendingWB}</span>` : '';
+      html += `<div class="sb-item${locked?' locked':''}" id="nav-${item.id}"${!locked?` onclick="showPage('${item.id}')"`:''}>
+        ${ICONS[item.icon]}<span>${item.label}</span>${badge}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  nav.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE ROUTING
+═══════════════════════════════════════════════ */
+function showPage(pageId) {
+  currentPage = pageId;
+  const perms = ROLE_PERMS[currentRole];
+  const perm = perms[pageId];
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const navEl = document.getElementById('nav-'+pageId);
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('topTitle').textContent = PAGE_TITLES[pageId] || pageId;
+  const container = document.getElementById('pageContent');
+  container.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'fade-in';
+  if (!perm) {
+    div.innerHTML = renderAccessDenied(pageId);
+  } else {
+    const renders = {dashboard:renderDashboard,production:renderProduction,stock:renderStock,weighbridge:renderWeighbridge,dispatch:renderDispatch,sales:renderSales,customers:renderCustomers,reports:renderReports,users:renderUsers,audit:renderAudit};
+    div.innerHTML = (renders[pageId] || (() => '<p>Page not found</p>'))(perm);
+  }
+  container.appendChild(div);
+  closeSB();
+  if (pageId === 'weighbridge' && perm === 'full') setTimeout(calcInlineWB, 50);
+}
+function renderAccessDenied(pageId) {
+  return `<div class="access-wall">
+    <div class="aw-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Access Denied</h3>
+    <p style="color:var(--t2);max-width:340px;line-height:1.6;font-size:13px">Your role (<strong style="color:var(--t1)">${ROLE_LABELS[currentRole]}</strong>) does not have permission to access <strong style="color:var(--t1)">${PAGE_TITLES[pageId]}</strong>. Contact your administrator.</p>
+  </div>`;
+}
+function roBanner(msg='') {
+  return `<div class="ro-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span><strong style="color:var(--blue)">View Only</strong>${msg?' — '+msg:' — You can view this data but cannot make changes.'}</span></div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════ */
+function getCustomerName(cid) {
+  const c = DB.customers.find(x => x.id === cid);
+  return c ? c.name : cid;
+}
+function orderStatusBadge(s) {
+  const map = {Completed:'green',Pending:'amber','In Progress':'gold',Loading:'blue',Cancelled:'red'};
+  return `<span class="badge ${map[s]||'grey'}">${s}</span>`;
+}
+function invoiceStatusBadge(s) {
+  const map = {Paid:'green',Overdue:'red',Partial:'amber',Unpaid:'grey'};
+  return `<span class="badge ${map[s]||'grey'}">${s}</span>`;
+}
+function fmtDT(dtStr) {
+  if (!dtStr) return '—';
+  return dtStr.replace('T',' ').slice(0,16);
+}
+function fmtNum(n) { return Number(n).toLocaleString(); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function nowDT() { return new Date().toISOString().slice(0,16); }
+function totalStock() { return Object.values(DB.stock).reduce((a,b)=>a+b,0); }
+function todayDispatched() { return DB.weighbridge.filter(w=>w.datetime.startsWith(todayStr())).reduce((a,b)=>a+b.netTons,0); }
+function monthRevenue() { const m=new Date().toISOString().slice(0,7); return DB.invoices.filter(i=>i.status==='Paid'&&i.date.startsWith(m)).reduce((a,b)=>a+b.amount,0); }
+function pendingInvoices() { return DB.invoices.filter(i=>i.status!=='Paid').length; }
+function activeOrders() { return DB.orders.filter(o=>o.status==='Pending'||o.status==='In Progress'||o.status==='Loading').length; }
+
+function updateLoginStats() {
+  document.getElementById('lb-disp').textContent = fmtNum(Math.round(todayDispatched()));
+  document.getElementById('lb-orders').textContent = activeOrders();
+  document.getElementById('lb-stock').textContent = fmtNum(totalStock());
+  document.getElementById('lb-rev').textContent = 'TZS '+fmtNum(monthRevenue());
+}
+
+/* ═══════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════ */
+function renderDashboard(perm) {
+  const perms = ROLE_PERMS[currentRole];
+  const todayProd = DB.production.filter(b=>b.datetime.startsWith(todayStr())).reduce((a,b)=>a+Number(b.qty),0);
+  const stockTotal = totalStock();
+  const disp = todayDispatched();
+  const rev = monthRevenue();
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Operations Dashboard</div><div class="sec-sub">Real-time overview — data persists in localStorage</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${perm==='full'?`<button class="btn btn-ghost btn-sm" onclick="toast('Exporting report...','info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Export</button>`:''}
+      ${perms.production&&perms.production!=='view'?`<button class="btn btn-primary btn-sm" onclick="openModal('mProduction')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry</button>`:''}
+    </div>
+  </div>
+  <div class="stats-grid sg-5">
+    <div class="stat-card"><div class="stat-icon si-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-6"/></svg></div><div><div class="stat-val">${fmtNum(todayProd||1840)}</div><div class="stat-label">Tons Produced Today</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div><div class="stat-val">${fmtNum(stockTotal)}</div><div class="stat-label">Total Stock (tons)</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div><div class="stat-val">${fmtNum(Math.round(disp)||4820)}</div><div class="stat-label">Tons Dispatched Today</div></div></div>
+    ${perms.sales?`<div class="stat-card"><div class="stat-icon si-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div><div class="stat-val" style="font-size:16px">TZS ${fmtNum(rev)}</div><div class="stat-label">Revenue This Month</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div><div class="stat-val">${pendingInvoices()}</div><div class="stat-label">Unpaid Invoices</div></div></div>`:''}
+  </div>
+  <div class="dash-grid">
+    <div class="card card-accent">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Weekly Production</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:16px">Tons produced — last 7 days</div>
+      <svg viewBox="0 0 520 180" style="width:100%;overflow:visible">
+        <line x1="0" y1="40" x2="520" y2="40" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="80" x2="520" y2="80" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="120" x2="520" y2="120" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="160" x2="520" y2="160" stroke="#252f4a" stroke-width="1"/>
+        <text x="2" y="38" fill="#5a6580" font-size="10">500</text><text x="2" y="78" fill="#5a6580" font-size="10">400</text><text x="2" y="118" fill="#5a6580" font-size="10">300</text><text x="2" y="158" fill="#5a6580" font-size="10">200</text>
+        <rect x="38" y="60" width="11" height="100" rx="2" fill="#e8a045" opacity=".85"/><rect x="51" y="80" width="11" height="80" rx="2" fill="#4f8ef7" opacity=".85"/><rect x="64" y="100" width="11" height="60" rx="2" fill="#3ecf8e" opacity=".85"/>
+        <rect x="110" y="50" width="11" height="110" rx="2" fill="#e8a045" opacity=".85"/><rect x="123" y="70" width="11" height="90" rx="2" fill="#4f8ef7" opacity=".85"/><rect x="136" y="95" width="11" height="65" rx="2" fill="#3ecf8e" opacity=".85"/>
+        <rect x="182" y="55" width="11" height="105" rx="2" fill="#e8a045" opacity=".85"/><rect x="195" y="65" width="11" height="95" rx="2" fill="#4f8ef7" opacity=".85"/><rect x="208" y="88" width="11" height="72" rx="2" fill="#3ecf8e" opacity=".85"/>
+        <rect x="254" y="40" width="11" height="120" rx="2" fill="#e8a045" opacity=".85"/><rect x="267" y="60" width="11" height="100" rx="2" fill="#4f8ef7" opacity=".85"/>
+        <rect x="326" y="45" width="11" height="115" rx="2" fill="#e8a045" opacity=".85"/><rect x="339" y="72" width="11" height="88" rx="2" fill="#4f8ef7" opacity=".85"/>
+        <rect x="398" y="35" width="11" height="125" rx="2" fill="#e8a045" opacity=".85"/><rect x="411" y="52" width="11" height="108" rx="2" fill="#4f8ef7" opacity=".85"/>
+        <rect x="470" y="30" width="11" height="130" rx="2" fill="#e8a045"/><rect x="483" y="46" width="11" height="114" rx="2" fill="#4f8ef7"/>
+        <text x="58" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Mon</text>
+        <text x="130" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Tue</text>
+        <text x="202" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Wed</text>
+        <text x="266" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Thu</text>
+        <text x="338" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Fri</text>
+        <text x="410" y="178" fill="#5a6580" font-size="10" text-anchor="middle">Sat</text>
+        <text x="482" y="178" fill="#e8a045" font-size="10" text-anchor="middle" font-weight="700">Today</text>
+      </svg>
+      <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">
+        ${['Stone Dust:#e8a045','Chippings:#4f8ef7','½ Inch:#3ecf8e'].map(s=>`<span style="font-size:11px;color:var(--t2);display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:${s.split(':')[1]};display:inline-block"></span>${s.split(':')[0]}</span>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Stock Levels</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:16px">Current inventory</div>
+      ${PRODUCTS.map(p => {
+        const val = DB.stock[p] || 0;
+        const cap = PRODUCT_CAPS[p];
+        const pct = Math.round(val/cap*100);
+        const cls = pct < 35 ? 'pf-red' : pct < 55 ? 'pf-gold' : 'pf-blue';
+        return `<div class="stock-bar-item"><div class="stock-bar-head"><span class="stock-bar-name">${p}</span><span class="stock-bar-nums"><b>${fmtNum(val)}</b> / ${fmtNum(cap)} t</span></div><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div></div>`;
+      }).join('')}
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:var(--t2)">Total: <b style="color:var(--t1)">${fmtNum(stockTotal)} tons</b></span>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('stock')">View All</button>
+      </div>
+    </div>
+  </div>
+  <div class="dash-grid-3">
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Recent Activity</div>
+      ${DB.auditLog.slice(0,5).map(l=>`<div class="activity-item">
+        <div class="act-dot" style="background:var(--${l.action==='CREATE'?'green':l.action==='LOGIN'?'blue':'gold'}-dim);color:var(--${l.action==='CREATE'?'green':l.action==='LOGIN'?'blue':'gold'})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div><div class="act-text">${l.detail}</div><div class="act-time">${fmtDT(l.ts)} · ${l.user}</div></div>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Active Orders</div>
+      ${DB.orders.filter(o=>o.status!=='Completed'&&o.status!=='Cancelled').slice(0,4).map(o=>`<div class="dispatch-item">
+        <div class="dispatch-truck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+        <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${getCustomerName(o.customerId)}</div><div style="font-size:11px;color:var(--t2)">${o.product} · ${o.qty}t</div></div>
+        ${orderStatusBadge(o.status)}
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Quick Actions</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${perms.production&&perms.production!=='view'?`<button class="btn btn-ghost" style="width:100%;justify-content:flex-start" onclick="openModal('mProduction')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Production Entry</button>`:''}
+        ${perms.weighbridge==='full'?`<button class="btn btn-ghost" style="width:100%;justify-content:flex-start" onclick="openModal('mWeighbridge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="2"/></svg>Weighbridge Entry</button>`:''}
+        ${perms.dispatch&&perms.dispatch!=='view'?`<button class="btn btn-ghost" style="width:100%;justify-content:flex-start" onclick="openModal('mOrder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Create Order</button>`:''}
+        ${perms.sales==='full'?`<button class="btn btn-ghost" style="width:100%;justify-content:flex-start" onclick="showPage('sales')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>View Invoices</button>`:''}
+        ${perms.reports?`<button class="btn btn-ghost" style="width:100%;justify-content:flex-start" onclick="showPage('reports')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>View Reports</button>`:''}
+        ${!perms.production&&!perms.weighbridge&&!perms.dispatch&&!perms.sales?`<p style="font-size:12px;color:var(--t3);text-align:center;padding:16px 0">No quick actions for your role.</p>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   PRODUCTION
+═══════════════════════════════════════════════ */
+function renderProduction(perm) {
+  const isFull = perm==='full', isEntry=perm==='entry', isView=perm==='view';
+  const batches = DB.production;
+  const todayBatches = batches.filter(b=>b.datetime.startsWith(todayStr()));
+  const todayTons = todayBatches.reduce((a,b)=>a+Number(b.qty),0);
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Production Entry</div><div class="sec-sub">Record aggregate output by batch, shift, and operator</div></div>
+    ${isFull||isEntry?`<button class="btn btn-primary" onclick="openModal('mProduction')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry</button>`:''}
+  </div>
+  ${isView?roBanner('You can view production records but cannot add or edit batches.'):''}
+  ${isEntry?`<div class="ro-banner" style="background:var(--amber-dim);border-color:rgba(240,170,48,.2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="color:var(--amber)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span><strong style="color:var(--amber)">Entry Mode</strong> — You can submit new entries only. Stock updates automatically.</span></div>`:''}
+  <div class="stats-grid sg-4">
+    <div class="stat-card"><div class="stat-icon si-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-6"/></svg></div><div><div class="stat-val">${batches.length}</div><div class="stat-label">Total Batches</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="stat-val">${todayBatches.length}</div><div class="stat-label">Batches Today</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="stat-val">${fmtNum(todayTons)}t</div><div class="stat-label">Produced Today</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><div class="stat-val">${fmtNum(batches.reduce((a,b)=>a+Number(b.qty),0))}t</div><div class="stat-label">All-Time Total</div></div></div>
+  </div>
+  <div class="filters">
+    <select class="f-sel" id="pf-product" onchange="showPage('production')"><option value="">All Products</option>${PRODUCTS.map(p=>`<option value="${p}">${p}</option>`).join('')}</select>
+    <select class="f-sel" id="pf-shift" onchange="showPage('production')"><option value="">All Shifts</option><option value="morning">Morning</option><option value="evening">Evening</option><option value="night">Night</option></select>
+    ${isFull?`<button class="btn btn-ghost btn-sm" onclick="toast('Exporting...','info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Export</button>`:''}
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Batch ID</th><th>Product</th><th>Qty</th><th>Machine</th><th>Shift</th><th>Operator</th><th>Date & Time</th><th>Status</th>${isFull?'<th>Actions</th>':''}</tr></thead>
+    <tbody>${batches.map(b=>`<tr>
+      <td><code class="ref" style="color:var(--gold)">${b.id}</code></td>
+      <td>${b.product}</td><td style="font-weight:700">${b.qty}t</td><td>${b.machine}</td>
+      <td><span class="shift-${b.shift}">${b.shift.charAt(0).toUpperCase()+b.shift.slice(1)}</span></td>
+      <td>${b.operator}</td><td style="font-size:11.5px;color:var(--t2)">${fmtDT(b.datetime)}</td>
+      <td><span class="badge green">${b.status}</span></td>
+      ${isFull?`<td><div style="display:flex;gap:5px"><button class="btn btn-ghost btn-sm" onclick="toast('Batch details: ${b.id}','info')">View</button></div></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   STOCK
+═══════════════════════════════════════════════ */
+function renderStock(perm) {
+  const isFull = perm==='full';
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Stock Management</div><div class="sec-sub">Real-time inventory — auto-updated by production and dispatch</div></div>
+    ${isFull?`<button class="btn btn-ghost btn-sm" onclick="toast('Transfer request submitted','success')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/></svg>Internal Transfer</button>`:''}
+  </div>
+  ${perm==='view'?roBanner('Stock levels update automatically via production (+) and dispatch (−) entries.'):''}
+  <div class="warn-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>Stock is <strong>system-controlled</strong>. It increases from production batches and decreases from weighbridge dispatches. Direct edits are not permitted.</div></div>
+  <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px">
+    ${[['Stone Dust','gold','pf-gold'],['Chippings','blue','pf-blue'],['½ Inch','green','pf-green'],['¾ Inch','red','pf-red'],['1 Inch','amber','pf-gold']].map(([name,col,pf])=>{
+      const val=DB.stock[name]||0, cap=PRODUCT_CAPS[name], pct=Math.round(val/cap*100);
+      const low=pct<35;
+      return `<div class="stock-visual-card">
+        <div class="svc-icon" style="background:var(--${col}-dim);color:var(--${col})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+        <div class="svc-val" style="color:var(--${col})">${fmtNum(val)}</div>
+        <div class="svc-unit">tons</div>
+        <div class="svc-name">${name}</div>
+        <div style="margin-top:10px"><div class="progress-bar"><div class="progress-fill ${pf}" style="width:${pct}%"></div></div></div>
+        <div style="font-size:11px;margin-top:5px;color:${low?'var(--amber)':'var(--t3)'}">${low?'⚠ Low stock':pct+'% capacity'}</div>
+      </div>`;
+    }).join('')}
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">Stock Movement Log</div>
+      <select class="f-sel"><option>All Types</option><option>Production IN</option><option>Dispatch OUT</option></select>
+    </div>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Date/Time</th><th>Product</th><th>Type</th><th>Qty (t)</th><th>Reference</th><th>Balance</th><th>Operator</th></tr></thead>
+      <tbody>${DB.stockMovements.map(m=>`<tr>
+        <td style="font-size:11.5px;color:var(--t2)">${fmtDT(m.datetime)}</td>
+        <td>${m.product}</td>
+        <td><span class="badge ${m.qty>0?'green':'red'}">${m.type}</span></td>
+        <td style="color:${m.qty>0?'var(--green)':'var(--red)'};font-weight:600">${m.qty>0?'+':''}${m.qty}</td>
+        <td><code class="ref" style="color:${m.qty>0?'var(--gold)':'var(--blue)'}">${m.ref}</code></td>
+        <td>${fmtNum(m.balance)}</td>
+        <td style="color:var(--t2)">${m.operator}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   WEIGHBRIDGE
+═══════════════════════════════════════════════ */
+function renderWeighbridge(perm) {
+  const isFull=perm==='full', isView=perm==='view';
+  const pending = DB.orders.filter(o=>o.status==='Pending'||o.status==='In Progress');
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Weighbridge Interface</div><div class="sec-sub">Record truck weights and auto-calculate net tonnage</div></div>
+    ${isFull?`<button class="btn btn-primary" onclick="openModal('mWeighbridge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry</button>`:''}
+  </div>
+  ${isView?roBanner('You can view weighbridge records. Creating entries requires Weighbridge Operator access.'):''}
+  <div class="info-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>Net Weight = <strong>Gross − Tare</strong>. Confirming dispatch deducts stock automatically and logs to audit trail.</div></div>
+  ${isFull?`
+  <div class="dash-grid" style="margin-bottom:20px">
+    <div class="card card-accent">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px">Live Session — WB-${String(DB.wbCounter).padStart(4,'0')}</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Linked Order</label>
+          <select class="form-select" id="wb-order">
+            ${pending.length?pending.map(o=>`<option value="${o.id}">${o.id} — ${getCustomerName(o.customerId)}</option>`).join(''):'<option>No active orders</option>'}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Truck Number</label><input class="form-input" type="text" id="wb-truck" placeholder="e.g. TZA-5510"></div>
+        <div class="form-group"><label class="form-label">Driver Name</label><input class="form-input" type="text" id="wb-driver" placeholder="Driver full name"></div>
+        <div class="form-group"><label class="form-label">Product</label><select class="form-select" id="wb-product">${PRODUCTS.map(p=>`<option>${p}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Gross Weight (kg)</label><input class="form-input" type="number" id="wb-gross" placeholder="e.g. 42600" oninput="calcInlineWB()"></div>
+        <div class="form-group"><label class="form-label">Tare Weight (kg)</label><input class="form-input" type="number" id="wb-tare" placeholder="e.g. 16800" oninput="calcInlineWB()"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="confirmInlineWB()">Confirm Dispatch</button>
+        <button class="btn btn-ghost" onclick="toast('Saved as draft','info')">Save Draft</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="wb-calc"><div class="wb-calc-label">Gross Weight</div><div class="wb-calc-val" style="color:var(--t2)" id="wb-disp-g">—</div><div class="wb-calc-unit">kg</div></div>
+      <div class="wb-calc"><div class="wb-calc-label">Tare Weight</div><div class="wb-calc-val" style="color:var(--t2)" id="wb-disp-t">—</div><div class="wb-calc-unit">kg</div></div>
+      <div class="wb-calc" style="border-color:var(--gold)"><div class="wb-calc-label" style="color:var(--gold)">Net Weight</div><div class="wb-calc-val" id="wb-disp-n">—</div><div class="wb-calc-unit"><strong id="wb-disp-nt"></strong></div></div>
+    </div>
+  </div>`:''}
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Ticket #</th><th>Order</th><th>Truck</th><th>Driver</th><th>Product</th><th>Gross (kg)</th><th>Tare (kg)</th><th>Net (t)</th><th>Time</th><th>Status</th></tr></thead>
+    <tbody>${DB.weighbridge.map(w=>`<tr>
+      <td><code class="ref" style="color:var(--gold)">${w.id}</code></td>
+      <td><code class="ref" style="color:var(--blue)">${w.orderId}</code></td>
+      <td>${w.truck}</td><td>${w.driver}</td><td>${w.product}</td>
+      <td>${fmtNum(w.gross)}</td><td>${fmtNum(w.tare)}</td>
+      <td style="font-weight:700">${w.netTons.toFixed(2)}</td>
+      <td style="font-size:11.5px;color:var(--t2)">${fmtDT(w.datetime)}</td>
+      <td><span class="badge green">${w.status}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function calcInlineWB() {
+  const g = parseFloat(document.getElementById('wb-gross')?.value)||0;
+  const t = parseFloat(document.getElementById('wb-tare')?.value)||0;
+  const net = Math.max(0,g-t);
+  if (document.getElementById('wb-disp-g')) {
+    document.getElementById('wb-disp-g').textContent = g?fmtNum(g):'—';
+    document.getElementById('wb-disp-t').textContent = t?fmtNum(t):'—';
+    document.getElementById('wb-disp-n').textContent = net?fmtNum(net):'—';
+    document.getElementById('wb-disp-nt').textContent = net?(net/1000).toFixed(2)+' tons':'';
+  }
+}
+
+function confirmInlineWB() {
+  const truck = document.getElementById('wb-truck')?.value?.trim();
+  const driver = document.getElementById('wb-driver')?.value?.trim();
+  const gross = parseFloat(document.getElementById('wb-gross')?.value)||0;
+  const tare = parseFloat(document.getElementById('wb-tare')?.value)||0;
+  const product = document.getElementById('wb-product')?.value;
+  const orderId = document.getElementById('wb-order')?.value;
+  if (!truck||!driver||!gross||!tare) { toast('Please fill all required fields','error'); return; }
+  if (gross<=tare) { toast('Gross weight must be greater than tare weight','error'); return; }
+  const net = gross-tare;
+  const netTons = net/1000;
+  if (DB.stock[product] < netTons) { toast('Insufficient stock for '+product,'error'); return; }
+  const wbId = 'WB-'+String(DB.wbCounter).padStart(4,'0');
+  DB.wbCounter++;
+  DB.weighbridge.unshift({id:wbId,orderId,truck,driver,product,gross,tare,net,netTons,datetime:nowDT(),status:'Dispatched',operator:currentUser.name});
+  DB.stock[product] = Math.max(0, DB.stock[product]-netTons);
+  DB.stockMovements.unshift({datetime:nowDT(),product,type:'OUT · Dispatch',qty:-netTons,ref:wbId,balance:DB.stock[product],operator:currentUser.name});
+  // Update order dispatched
+  const ord = DB.orders.find(o=>o.id===orderId);
+  if (ord) { ord.dispatched = (ord.dispatched||0)+netTons; if(ord.dispatched>=ord.qty) ord.status='Completed'; }
+  addAudit('CREATE','Weighbridge',wbId,`Dispatch ${truck} — ${netTons.toFixed(2)}t ${product}`);
+  saveDB(); buildSidebar();
+  toast(`${wbId} confirmed — ${netTons.toFixed(2)}t ${product} deducted from stock`,'success');
+  showPage('weighbridge');
+}
+
+/* ═══════════════════════════════════════════════
+   DISPATCH
+═══════════════════════════════════════════════ */
+function renderDispatch(perm) {
+  const canOrder = perm==='full'||perm==='order';
+  const isView = perm==='view';
+  const active = DB.orders.filter(o=>o.status!=='Completed'&&o.status!=='Cancelled');
+  const completed = DB.orders.filter(o=>o.status==='Completed');
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Orders & Dispatch</div><div class="sec-sub">Manage customer orders and track deliveries</div></div>
+    ${canOrder?`<button class="btn btn-primary" onclick="openModal('mOrder')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Order</button>`:''}
+  </div>
+  ${isView?roBanner():''}
+  <div class="stats-grid sg-4">
+    <div class="stat-card"><div class="stat-icon si-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div><div class="stat-val">${active.length}</div><div class="stat-label">Active Orders</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="stat-val">${completed.length}</div><div class="stat-label">Completed</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div><div class="stat-val">${DB.weighbridge.length}</div><div class="stat-label">Total Trips</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div><div class="stat-val">${DB.orders.filter(o=>o.status==='Pending').length}</div><div class="stat-label">Pending Dispatch</div></div></div>
+  </div>
+  <div class="filters">
+    <input class="f-input" type="text" placeholder="Search order, customer..." id="df-search" oninput="showPage('dispatch')">
+    <select class="f-sel" id="df-status" onchange="showPage('dispatch')"><option value="">All Statuses</option><option>Pending</option><option>In Progress</option><option>Completed</option></select>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Order #</th><th>Customer</th><th>Product</th><th>Ordered</th><th>Dispatched</th><th>Remaining</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${DB.orders.map(o=>{
+      const rem = Math.max(0,o.qty-(o.dispatched||0));
+      return `<tr>
+        <td><code class="ref" style="color:var(--blue)">${o.id}</code></td>
+        <td>${getCustomerName(o.customerId)}</td>
+        <td>${o.product}</td>
+        <td>${o.qty}t</td>
+        <td>${(o.dispatched||0).toFixed(1)}t</td>
+        <td style="${rem>0?'color:var(--amber)':''}">${rem.toFixed(1)}t</td>
+        <td>${orderStatusBadge(o.status)}</td>
+        <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="toast('Order ${o.id}: ${getCustomerName(o.customerId)} — ${o.product} ${o.qty}t','info')">View</button>
+          ${perm==='full'&&o.status!=='Completed'?`<button class="btn btn-primary btn-sm" onclick="openWeighbridgeForOrder('${o.id}')">Weigh</button>`:''}
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+function openWeighbridgeForOrder(orderId) {
+  openModal('mWeighbridge');
+  setTimeout(()=>{
+    const sel = document.getElementById('mw-order');
+    if (sel) sel.value = orderId;
+  },100);
+}
+
+/* ═══════════════════════════════════════════════
+   SALES
+═══════════════════════════════════════════════ */
+function renderSales(perm) {
+  const isFull = perm==='full', isView=perm==='view';
+  const paid = DB.invoices.filter(i=>i.status==='Paid');
+  const unpaid = DB.invoices.filter(i=>i.status!=='Paid');
+  const totalRev = paid.reduce((a,b)=>a+b.amount,0);
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Sales & Billing</div><div class="sec-sub">Invoices, payments, and financial records</div></div>
+    ${isFull?`<button class="btn btn-primary" onclick="genInvoiceModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Generate Invoice</button>`:''}
+  </div>
+  ${isView?roBanner('You can view invoices. Recording payments requires Accountant access.'):''}
+  <div class="stats-grid sg-4">
+    <div class="stat-card card-accent-green"><div class="stat-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div><div class="stat-val" style="font-size:15px">TZS ${fmtNum(totalRev)}</div><div class="stat-label">Total Revenue</div><div class="stat-change up">↑ from ${paid.length} paid invoices</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="stat-val">${paid.length}</div><div class="stat-label">Paid Invoices</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><div><div class="stat-val">${unpaid.length}</div><div class="stat-label">Unpaid Invoices</div><div class="stat-change down">TZS ${fmtNum(unpaid.reduce((a,b)=>a+b.amount,0))} outstanding</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div><div class="stat-val">${DB.invoices.length}</div><div class="stat-label">Total Invoices</div></div></div>
+  </div>
+  <div class="filters">
+    <input class="f-input" type="text" placeholder="Search invoice, customer...">
+    <select class="f-sel"><option>All Statuses</option><option>Paid</option><option>Unpaid</option><option>Overdue</option><option>Partial</option></select>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Invoice #</th><th>Order</th><th>Customer</th><th>Product</th><th>Qty</th><th>Amount (TZS)</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${DB.invoices.map(inv=>`<tr>
+      <td><code class="ref" style="color:${inv.status==='Paid'?'var(--green)':inv.status==='Overdue'?'var(--red)':'var(--amber)'}">${inv.id}</code></td>
+      <td><code class="ref" style="color:var(--blue)">${inv.orderId}</code></td>
+      <td>${getCustomerName(inv.customerId)}</td>
+      <td>${inv.product}</td><td>${inv.qty}t</td>
+      <td style="font-weight:600">${fmtNum(inv.amount)}</td>
+      <td style="font-size:11.5px;color:var(--t2)">${inv.date}</td>
+      <td>${invoiceStatusBadge(inv.status)}</td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="viewInvoice('${inv.id}')">View</button>
+        ${isFull&&inv.status!=='Paid'?`<button class="btn btn-success btn-sm" onclick="openPaymentModal('${inv.id}')">Pay</button>`:''}
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function genInvoiceModal() {
+  const completedOrders = DB.orders.filter(o=>o.status==='Completed');
+  const existingInvOrders = DB.invoices.map(i=>i.orderId);
+  const uninvoiced = completedOrders.filter(o=>!existingInvOrders.includes(o.id));
+  if (!uninvoiced.length) { toast('No uninvoiced completed orders found','info'); return; }
+  const o = uninvoiced[0];
+  const amount = o.qty * o.price;
+  const invId = 'INV-'+String(DB.invoiceCounter).padStart(4,'0');
+  DB.invoiceCounter++;
+  DB.invoices.unshift({id:invId,orderId:o.id,customerId:o.customerId,product:o.product,qty:o.qty,amount,method:'',date:todayStr(),status:'Unpaid',paidDate:'',notes:''});
+  addAudit('CREATE','Sales',invId,'Invoice generated for '+o.id+' — TZS '+fmtNum(amount));
+  saveDB();
+  toast('Invoice '+invId+' generated for '+getCustomerName(o.customerId),'success');
+  showPage('sales');
+}
+
+function viewInvoice(invId) {
+  const inv = DB.invoices.find(i=>i.id===invId);
+  if (!inv) return;
+  currentInvoiceId = invId;
+  document.getElementById('mInv-title').textContent = 'Invoice '+invId;
+  document.getElementById('mInv-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div><div class="form-label">Customer</div><div style="font-weight:600">${getCustomerName(inv.customerId)}</div></div>
+      <div><div class="form-label">Order</div><code class="ref" style="color:var(--blue)">${inv.orderId}</code></div>
+      <div><div class="form-label">Product</div><div>${inv.product} — ${inv.qty}t</div></div>
+      <div><div class="form-label">Amount</div><div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--gold)">TZS ${fmtNum(inv.amount)}</div></div>
+      <div><div class="form-label">Invoice Date</div><div>${inv.date}</div></div>
+      <div><div class="form-label">Status</div>${invoiceStatusBadge(inv.status)}</div>
+      ${inv.paidDate?`<div><div class="form-label">Paid On</div><div style="color:var(--green)">${inv.paidDate}</div></div>`:''}
+      ${inv.notes?`<div style="grid-column:span 2"><div class="form-label">Notes</div><div style="color:var(--t2)">${inv.notes}</div></div>`:''}
+    </div>`;
+  const perms = ROLE_PERMS[currentRole];
+  const payBtn = document.getElementById('mInv-pay-btn');
+  payBtn.style.display = (perms.sales==='full'&&inv.status!=='Paid') ? 'flex' : 'none';
+  openModal('mInvoice');
+}
+
+function openPaymentModal(invId) {
+  currentInvoiceId = invId;
+  viewInvoice(invId);
+}
+
+function recordPayment() {
+  if (!currentInvoiceId) return;
+  const inv = DB.invoices.find(i=>i.id===currentInvoiceId);
+  if (!inv) return;
+  inv.status = 'Paid'; inv.paidDate = todayStr(); inv.method = 'Bank Transfer';
+  addAudit('UPDATE','Sales',inv.id,'Payment recorded — TZS '+fmtNum(inv.amount));
+  saveDB();
+  toast('Payment recorded for '+inv.id,'success');
+  closeModal('mInvoice');
+  showPage('sales');
+}
+
+/* ═══════════════════════════════════════════════
+   CUSTOMERS
+═══════════════════════════════════════════════ */
+function renderCustomers(perm) {
+  const isFull = perm==='full', isView=perm==='view';
+  const gradients = ['linear-gradient(135deg,#e8a045,#c4772a)','linear-gradient(135deg,#4f8ef7,#2a5abc)','linear-gradient(135deg,#3ecf8e,#1a8a60)','linear-gradient(135deg,#f25e5e,#8a2020)','linear-gradient(135deg,#f0aa30,#b87d00)','linear-gradient(135deg,#9b59b6,#6c3483)'];
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Customer Management</div><div class="sec-sub">Manage clients and purchase history</div></div>
+    ${isFull?`<button class="btn btn-primary" onclick="openModal('mCustomer')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Customer</button>`:''}
+  </div>
+  ${isView?roBanner('You can view customer info but cannot add or edit customers.'):''}
+  <div class="filters">
+    <input class="f-input" type="text" placeholder="Search customers...">
+    <select class="f-sel"><option>All Regions</option><option>Dar es Salaam</option><option>Arusha</option><option>Dodoma</option></select>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+    ${DB.customers.map((c,i)=>{
+      const orders = DB.orders.filter(o=>o.customerId===c.id);
+      const spent = DB.invoices.filter(inv=>inv.customerId===c.id&&inv.status==='Paid').reduce((a,b)=>a+b.amount,0);
+      const vol = orders.reduce((a,b)=>a+(b.dispatched||0),0);
+      return `<div class="customer-card">
+        <div class="cust-av" style="background:${gradients[i%gradients.length]};color:#fff">${c.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+        <div class="cust-name">${c.name}</div>
+        <div class="cust-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${c.location||'—'}</div>
+        <div class="cust-detail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07"/></svg>${c.phone||'—'}</div>
+        ${c.notes?`<div style="font-size:11.5px;color:var(--t3);margin-top:4px;font-style:italic">${c.notes}</div>`:''}
+        <div class="cust-stats">
+          <div><div class="cust-stat-val">${orders.length}</div><div class="cust-stat-label">Orders</div></div>
+          <div><div class="cust-stat-val">${vol.toFixed(0)}t</div><div class="cust-stat-label">Volume</div></div>
+          <div><div class="cust-stat-val">TZS ${fmtNum(spent)}</div><div class="cust-stat-label">Paid</div></div>
+        </div>
+        <div style="display:flex;gap:7px;margin-top:12px">
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="toast('${c.name} — ${c.phone}','info')">Details</button>
+          ${(isFull||perm==='order')?`<button class="btn btn-primary btn-sm" style="flex:1" onclick="openOrderForCustomer('${c.id}')">New Order</button>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function openOrderForCustomer(customerId) {
+  openModal('mOrder');
+  setTimeout(()=>{
+    const sel = document.getElementById('mo-customer');
+    if (sel) { for(let i=0;i<sel.options.length;i++) { if(sel.options[i].value===customerId) { sel.selectedIndex=i; break; } } }
+  },100);
+}
+
+/* ═══════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════ */
+function renderReports(perm) {
+  const isFull = perm==='full';
+  const totalProd = DB.production.reduce((a,b)=>a+Number(b.qty),0);
+  const totalDisp = DB.weighbridge.reduce((a,b)=>a+b.netTons,0);
+  const reconcile = totalProd - totalDisp - totalStock();
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Reports & Analytics</div><div class="sec-sub">Operational data, reconciliation, and exports</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <select class="f-sel"><option>This Month</option><option>Last Month</option><option>Last 7 Days</option></select>
+      ${isFull?`<button class="btn btn-primary btn-sm" onclick="toast('Generating all reports...','info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Export All</button>`:''}
+    </div>
+  </div>
+  <div class="stats-grid sg-4" style="margin-bottom:20px">
+    <div class="stat-card"><div class="stat-icon si-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-6"/></svg></div><div><div class="stat-val">${fmtNum(totalProd)}t</div><div class="stat-label">Total Production</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg></div><div><div class="stat-val">${fmtNum(Math.round(totalDisp))}t</div><div class="stat-label">Total Dispatched</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div><div class="stat-val" style="font-size:16px">TZS ${fmtNum(monthRevenue())}</div><div class="stat-label">Monthly Revenue</div></div></div>
+    <div class="stat-card"><div class="stat-icon si-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div class="stat-val">${fmtNum(Math.abs(Math.round(reconcile)))}t</div><div class="stat-label">Variance (Recon.)</div></div></div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));margin-bottom:20px">
+    ${[
+      ['Daily Production Report','Output by product, shift','gold','tool'],
+      ['Stock Balance Report','Current stock per product','blue','box'],
+      ['Sales Report','By customer, product, volume','green','card'],
+      ['Reconciliation Report','Production vs Dispatch','amber','chart'],
+      ['Weighbridge Log','All weighbridge tickets','red','scale'],
+      ['Audit Log Export','Full system activity trail','grey','check'],
+    ].map(([title,sub,col,ico])=>`
+    <div class="report-card" onclick="toast('Opening ${title}...','info')">
+      <div class="report-icon" style="background:var(--${col==='grey'?'border':col+'-dim'});color:var(--${col==='grey'?'t2':col})">${ICONS[ico]}</div>
+      <div><div style="font-weight:700;font-size:13px">${title}</div><div style="font-size:11.5px;color:var(--t2);margin-top:3px">${sub}</div></div>
+    </div>`).join('')}
+  </div>
+  <div class="dash-grid">
+    <div class="chart-box card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Revenue Trend</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:14px">Monthly — last 6 months (TZS)</div>
+      <svg viewBox="0 0 480 160" style="width:100%">
+        <defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8a045" stop-opacity="0.3"/><stop offset="100%" stop-color="#e8a045" stop-opacity="0"/></linearGradient></defs>
+        <line x1="0" y1="20" x2="480" y2="20" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="60" x2="480" y2="60" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="100" x2="480" y2="100" stroke="#252f4a" stroke-width="1"/>
+        <line x1="0" y1="140" x2="480" y2="140" stroke="#252f4a" stroke-width="1"/>
+        <path d="M30 115 L110 96 L190 82 L270 55 L350 38 L430 20 L430 140 L350 140 L270 140 L190 140 L110 140 L30 140 Z" fill="url(#rg)"/>
+        <path d="M30 115 L110 96 L190 82 L270 55 L350 38 L430 20" stroke="#e8a045" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="30" cy="115" r="4" fill="#e8a045"/><circle cx="110" cy="96" r="4" fill="#e8a045"/><circle cx="190" cy="82" r="4" fill="#e8a045"/><circle cx="270" cy="55" r="4" fill="#e8a045"/><circle cx="350" cy="38" r="4" fill="#e8a045"/><circle cx="430" cy="20" r="5" fill="#e8a045" stroke="#0a0d14" stroke-width="2"/>
+        <text x="30" y="158" fill="#5a6580" font-size="10" text-anchor="middle">Aug</text><text x="110" y="158" fill="#5a6580" font-size="10" text-anchor="middle">Sep</text><text x="190" y="158" fill="#5a6580" font-size="10" text-anchor="middle">Oct</text><text x="270" y="158" fill="#5a6580" font-size="10" text-anchor="middle">Nov</text><text x="350" y="158" fill="#5a6580" font-size="10" text-anchor="middle">Dec</text><text x="430" y="158" fill="#e8a045" font-size="10" text-anchor="middle" font-weight="600">Jan</text>
+        <text x="430" y="12" fill="#e8a045" font-size="10" text-anchor="middle" font-weight="700">TZS ${fmtNum(monthRevenue())}</text>
+      </svg>
+    </div>
+    <div class="card">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Product Distribution</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:12px">Current stock by type</div>
+      <svg viewBox="0 0 180 180" style="width:140px;display:block;margin:auto">
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#252f4a" stroke-width="24"/>
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#e8a045" stroke-width="24" stroke-dasharray="113 264" stroke-dashoffset="0" stroke-linecap="round"/>
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#4f8ef7" stroke-width="24" stroke-dasharray="83 264" stroke-dashoffset="-113" stroke-linecap="round"/>
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#3ecf8e" stroke-width="24" stroke-dasharray="49 264" stroke-dashoffset="-196" stroke-linecap="round"/>
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#f25e5e" stroke-width="24" stroke-dasharray="31 264" stroke-dashoffset="-245" stroke-linecap="round"/>
+        <text x="90" y="86" fill="#e8eaf0" font-size="15" font-weight="700" text-anchor="middle">${fmtNum(totalStock())}</text>
+        <text x="90" y="100" fill="#8d98b3" font-size="9" text-anchor="middle">tons</text>
+      </svg>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px">
+        ${[['#e8a045','Stone Dust'],['#4f8ef7','Chippings'],['#3ecf8e','½ Inch'],['#f25e5e','¾+1"']].map(([c,n])=>`<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><span style="width:8px;height:8px;border-radius:2px;background:${c};display:inline-block;flex-shrink:0"></span>${n}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   USERS
+═══════════════════════════════════════════════ */
+function renderUsers(perm) {
+  const isFull = perm==='full', isView=perm==='view';
+  const matrix = [
+    {role:'Admin',key:'admin',row:['full','full','full','full','full','full','full']},
+    {role:'Prod. Manager',key:'production_manager',row:['view','full','view',null,'view',null,null]},
+    {role:'Machine Operator',key:'machine_operator',row:[null,'entry',null,null,null,null,null]},
+    {role:'Weighbridge Op.',key:'weighbridge_operator',row:['view',null,'view','full','view',null,null]},
+    {role:'Accountant',key:'accountant',row:['view',null,'view','view','view','full','full']},
+    {role:'Sales Officer',key:'sales_officer',row:['view',null,'view',null,'order','order','view']},
+    {role:'Auditor',key:'auditor',row:['view','view','view','view','view','view','full']},
+  ];
+  const cellHtml = v => {
+    if(v==='full') return `<span class="perm-full">✓ Full</span>`;
+    if(v==='view') return `<span class="perm-view">View</span>`;
+    if(v==='entry') return `<span class="perm-entry">Entry</span>`;
+    if(v==='order') return `<span class="perm-order">Order</span>`;
+    return `<span class="perm-no">✗</span>`;
+  };
+  const gradients=['linear-gradient(135deg,#e8a045,#c4772a)','linear-gradient(135deg,#4f8ef7,#2a5abc)','linear-gradient(135deg,#3ecf8e,#1a8a60)','linear-gradient(135deg,#9b59b6,#6c3483)','linear-gradient(135deg,#f0aa30,#b87d00)','linear-gradient(135deg,#22c55e,#15803d)','linear-gradient(135deg,#f25e5e,#8a2020)'];
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">User Management</div><div class="sec-sub">System users and role-based access control</div></div>
+    ${isFull?`<button class="btn btn-primary" onclick="openModal('mUser')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add User</button>`:''}
+  </div>
+  ${isView?roBanner('You can view user accounts. Adding or editing users requires Admin access.'):''}
+  <div class="card" style="margin-bottom:20px;overflow-x:auto">
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Role Permissions Matrix</div>
+    <div style="font-size:11.5px;color:var(--t2);margin-bottom:14px">Your role is <span style="color:var(--gold)">highlighted in gold</span></div>
+    <div class="table-wrap" style="border:none"><table class="data-table" style="min-width:640px">
+      <thead><tr><th>Role</th><th>Dashboard</th><th>Production</th><th>Stock</th><th>Weighbridge</th><th>Dispatch</th><th>Sales</th><th>Reports</th></tr></thead>
+      <tbody>${matrix.map(r=>`<tr class="${r.key===currentRole?'my-role-row':''}">
+        <td>${r.role}${r.key===currentRole?` <span style="font-size:10px;color:var(--gold)">(You)</span>`:''}</td>
+        ${r.row.map(v=>`<td style="text-align:center">${cellHtml(v)}</td>`).join('')}
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>
+  <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+    ${DB.systemUsers.map((u,i)=>`<div class="user-card">
+      <div class="user-av" style="background:${gradients[i%gradients.length]};color:#fff">${u.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13.5px">${u.name}${u.email===currentUser?.name?'':''}</div>
+        <div style="font-size:11px;color:var(--t2)">${u.email}</div>
+        <span class="badge ${u.role==='admin'?'gold':u.role==='auditor'?'grey':'blue'}" style="margin-top:5px">${ROLE_LABELS[u.role]}</span>
+        ${u.role===currentRole?`<span style="font-size:10px;color:var(--gold);margin-left:6px;font-weight:600">← Your role</span>`:''}
+      </div>
+      ${isFull?`<div style="display:flex;flex-direction:column;gap:5px">
+        <button class="btn btn-ghost btn-sm" onclick="toast('Editing ${u.name}','info')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deactivateUser('${u.id}')">${u.active?'Deactivate':'Activate'}</button>
+      </div>`:''}
+    </div>`).join('')}
+  </div>`;
+}
+
+function deactivateUser(uid) {
+  const u = DB.systemUsers.find(x=>x.id===uid);
+  if (!u) return;
+  u.active = !u.active;
+  addAudit('UPDATE','Users',uid,(u.active?'Activated':'Deactivated')+' user: '+u.name);
+  saveDB();
+  toast((u.active?'Activated':'Deactivated')+': '+u.name,'success');
+  showPage('users');
+}
+
+/* ═══════════════════════════════════════════════
+   AUDIT LOG
+═══════════════════════════════════════════════ */
+function renderAudit(perm) {
+  const isFull = perm==='full';
+  const actionColor = {CREATE:'green',UPDATE:'blue',DELETE:'red',LOGIN:'gold',LOGOUT:'grey',EXPORT:'grey'};
+  return `
+  <div class="sec-hd">
+    <div><div class="sec-title">Audit Logs</div><div class="sec-sub">Complete trail of all user actions and system events</div></div>
+    ${isFull?`<button class="btn btn-ghost btn-sm" onclick="toast('Audit log exported','success')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>Export</button>`:''}
+  </div>
+  <div class="filters">
+    <input class="f-input" type="text" placeholder="Search user, action, module...">
+    <select class="f-sel"><option>All Actions</option><option>CREATE</option><option>UPDATE</option><option>DELETE</option><option>LOGIN</option><option>LOGOUT</option><option>EXPORT</option></select>
+    <select class="f-sel"><option>All Modules</option><option>Production</option><option>Weighbridge</option><option>Sales</option><option>Orders</option><option>Auth</option><option>Users</option></select>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Module</th><th>Record ID</th><th>Details</th></tr></thead>
+    <tbody>${DB.auditLog.map(l=>`<tr>
+      <td style="font-size:11.5px;color:var(--t2);white-space:nowrap">${fmtDT(l.ts)}</td>
+      <td style="font-weight:500">${l.user}</td>
+      <td><span class="badge grey">${ROLE_LABELS[l.role]||l.role}</span></td>
+      <td><span class="badge ${actionColor[l.action]||'grey'}">${l.action}</span></td>
+      <td style="color:var(--t2)">${l.module}</td>
+      <td><code class="ref">${l.recordId}</code></td>
+      <td style="color:var(--t2);font-size:12px">${l.detail}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>
+  <div class="pagination">
+    <div class="pg-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="pg-btn active">1</div><div class="pg-btn">2</div><div class="pg-btn">3</div>
+    <div class="pg-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   FORM SUBMISSIONS
+═══════════════════════════════════════════════ */
+function submitProduction() {
+  const product = document.getElementById('mp-product').value;
+  const qty = parseFloat(document.getElementById('mp-qty').value);
+  const machine = document.getElementById('mp-machine').value;
+  const shift = document.getElementById('mp-shift').value;
+  const operator = document.getElementById('mp-operator').value;
+  const datetime = document.getElementById('mp-datetime').value || nowDT();
+  const notes = document.getElementById('mp-notes').value;
+  if (!qty || qty <= 0) { toast('Please enter a valid quantity','error'); return; }
+  const id = 'B-2024-'+String(DB.batchCounter).padStart(4,'0');
+  DB.batchCounter++;
+  DB.production.unshift({id,product,qty,machine,shift,operator,datetime,notes,status:'Completed',addedBy:currentUser.name});
+  DB.stock[product] = (DB.stock[product]||0) + qty;
+  DB.stockMovements.unshift({datetime:nowDT(),product,type:'IN · Production',qty:+qty,ref:id,balance:DB.stock[product],operator:currentUser.name});
+  addAudit('CREATE','Production',id,`New batch — ${qty}t ${product}`);
+  saveDB(); buildSidebar();
+  toast(`${id} recorded — ${qty}t ${product} added to stock`,'success');
+  closeModal('mProduction');
+  if (currentPage==='production') showPage('production');
+  if (currentPage==='dashboard') showPage('dashboard');
+}
+
+function submitWeighbridge() {
+  const orderId = document.getElementById('mw-order').value;
+  const product = document.getElementById('mw-product').value;
+  const truck = document.getElementById('mw-truck').value.trim();
+  const driver = document.getElementById('mw-driver').value.trim();
+  const gross = parseFloat(document.getElementById('mw-gross').value)||0;
+  const tare = parseFloat(document.getElementById('mw-tare').value)||0;
+  if (!truck||!driver||!gross||!tare) { toast('Please fill all fields','error'); return; }
+  if (gross<=tare) { toast('Gross must be greater than tare','error'); return; }
+  const net = gross-tare; const netTons = net/1000;
+  if ((DB.stock[product]||0) < netTons) { toast('Insufficient '+product+' stock','error'); return; }
+  const wbId = 'WB-'+String(DB.wbCounter).padStart(4,'0');
+  DB.wbCounter++;
+  DB.weighbridge.unshift({id:wbId,orderId,truck,driver,product,gross,tare,net,netTons,datetime:nowDT(),status:'Dispatched',operator:currentUser.name});
+  DB.stock[product] = Math.max(0,(DB.stock[product]||0)-netTons);
+  DB.stockMovements.unshift({datetime:nowDT(),product,type:'OUT · Dispatch',qty:-netTons,ref:wbId,balance:DB.stock[product],operator:currentUser.name});
+  const ord = DB.orders.find(o=>o.id===orderId);
+  if (ord) { ord.dispatched=(ord.dispatched||0)+netTons; if(ord.dispatched>=ord.qty) ord.status='Completed'; }
+  addAudit('CREATE','Weighbridge',wbId,`${truck} — ${netTons.toFixed(2)}t ${product}`);
+  saveDB(); buildSidebar();
+  toast(`${wbId} confirmed — ${netTons.toFixed(2)}t dispatched`,'success');
+  closeModal('mWeighbridge');
+  if (currentPage==='weighbridge') showPage('weighbridge');
+  if (currentPage==='dashboard') showPage('dashboard');
+}
+
+function calcModalWB() {
+  const g = parseFloat(document.getElementById('mw-gross')?.value)||0;
+  const t = parseFloat(document.getElementById('mw-tare')?.value)||0;
+  const net = Math.max(0,g-t);
+  const el = document.getElementById('mw-net'); if (!el) return;
+  el.textContent = net ? fmtNum(net) : '—';
+  document.getElementById('mw-net-t').textContent = net ? (net/1000).toFixed(2)+' tons' : '';
+}
+
+function submitOrder() {
+  const customerId = document.getElementById('mo-customer').value;
+  const product = document.getElementById('mo-product').value;
+  const qty = parseFloat(document.getElementById('mo-qty').value);
+  const price = parseFloat(document.getElementById('mo-price').value);
+  const location = document.getElementById('mo-location').value.trim();
+  const date = document.getElementById('mo-date').value || todayStr();
+  const notes = document.getElementById('mo-notes').value;
+  if (!qty||qty<=0) { toast('Please enter a valid quantity','error'); return; }
+  if (!price||price<=0) { toast('Please enter a unit price','error'); return; }
+  const id = 'ORD-'+String(DB.orderCounter).padStart(4,'0');
+  DB.orderCounter++;
+  DB.orders.unshift({id,customerId,product,qty,price,dispatched:0,location,date:todayStr(),requiredBy:date,status:'Pending',notes,createdBy:currentUser.name});
+  addAudit('CREATE','Orders',id,`New order — ${getCustomerName(customerId)} ${qty}t ${product}`);
+  saveDB(); buildSidebar();
+  toast(`${id} created — ${qty}t ${product} for ${getCustomerName(customerId)}`,'success');
+  closeModal('mOrder');
+  if (currentPage==='dispatch') showPage('dispatch');
+}
+
+function submitCustomer() {
+  const name = document.getElementById('mc-name').value.trim();
+  const contact = document.getElementById('mc-contact').value.trim();
+  const phone = document.getElementById('mc-phone').value.trim();
+  const email = document.getElementById('mc-email').value.trim();
+  const location = document.getElementById('mc-location').value.trim();
+  const notes = document.getElementById('mc-notes').value.trim();
+  if (!name) { toast('Company name is required','error'); return; }
+  const id = 'C'+String(DB.customerCounter).padStart(3,'0');
+  DB.customerCounter++;
+  DB.customers.push({id,name,contact,phone,email,location,notes,createdAt:todayStr()});
+  addAudit('CREATE','Customers',id,'New customer: '+name);
+  saveDB();
+  toast('Customer "'+name+'" added','success');
+  closeModal('mCustomer');
+  if (currentPage==='customers') showPage('customers');
+}
+
+function submitUser() {
+  const name = document.getElementById('mu-name').value.trim();
+  const email = document.getElementById('mu-email').value.trim();
+  const role = document.getElementById('mu-role').value;
+  const pass = document.getElementById('mu-pass').value;
+  if (!name||!email) { toast('Name and email are required','error'); return; }
+  if (pass.length < 6) { toast('Password must be at least 6 characters','error'); return; }
+  const id = 'SU'+String(DB.suCounter).padStart(3,'0');
+  DB.suCounter++;
+  DB.systemUsers.push({id,name,email,role,active:true,createdAt:todayStr()});
+  addAudit('CREATE','Users',id,'New user: '+name+' ('+ROLE_LABELS[role]+')');
+  saveDB(); buildSidebar();
+  toast('User "'+name+'" created','success');
+  closeModal('mUser');
+  if (currentPage==='users') showPage('users');
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL POPULATION
+═══════════════════════════════════════════════ */
+function openModal(id) {
+  if (id==='mProduction') {
+    document.getElementById('mp-operator').innerHTML = DB.systemUsers.filter(u=>u.active).map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+    document.getElementById('mp-datetime').value = nowDT();
+  }
+  if (id==='mWeighbridge') {
+    const pending = DB.orders.filter(o=>o.status==='Pending'||o.status==='In Progress');
+    document.getElementById('mw-order').innerHTML = pending.length
+      ? pending.map(o=>`<option value="${o.id}">${o.id} — ${getCustomerName(o.customerId)}</option>`).join('')
+      : '<option value="">No active orders</option>';
+    document.getElementById('mw-net').textContent = '—';
+    document.getElementById('mw-net-t').textContent = '';
+    document.getElementById('mw-gross').value='';
+    document.getElementById('mw-tare').value='';
+  }
+  if (id==='mOrder') {
+    document.getElementById('mo-customer').innerHTML = DB.customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    document.getElementById('mo-date').value = '';
+    document.getElementById('mo-qty').value = '';
+    document.getElementById('mo-price').value = '';
+    document.getElementById('mo-location').value = '';
+    document.getElementById('mo-notes').value = '';
+  }
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR TOGGLE
+═══════════════════════════════════════════════ */
+function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sbOverlay').classList.toggle('open'); }
+function closeSB()   { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('open'); }
+
+/* ═══════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════ */
+function updateDate() {
+  const el = document.getElementById('tbDate');
+  if (el) el.textContent = new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+updateDate(); setInterval(updateDate, 60000);
+
+function toast(message, type='info') {
+  const icons = {
+    success:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+  };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="ti">${icons[type]}</span><span>${message}</span>`;
+  document.getElementById('tc').appendChild(t);
+  setTimeout(()=>{ t.style.cssText+='opacity:0;transform:translateX(20px);transition:.3s ease'; setTimeout(()=>t.remove(),300); },3500);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('login-page').style.display!=='none') doLogin();
+  if (e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+loadDB();
+updateLoginStats();
+</script>
+</body>
+</html>
